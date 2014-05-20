@@ -72,6 +72,7 @@ ActionNode::~ActionNode()
 void ActionNode::initWithDictionary(const rapidjson::Value& dic, Ref* root)
 {
     setActionTag(DICTOOL->getIntValue_json(dic, "ActionTag"));
+    initActionNodeFromRoot(root);
     int actionFrameCount = DICTOOL->getArrayCount_json(dic, "actionframelist");
     for (int i=0; i<actionFrameCount; i++)
     {
@@ -99,7 +100,14 @@ void ActionNode::initWithDictionary(const rapidjson::Value& dic, Ref* root)
             actionFrame->setFrameIndex(frameInex);
             actionFrame->setEasingType(frameTweenType);
             actionFrame->setEasingParameter(frameTweenParameter);
-            actionFrame->setPosition(Point(positionX, positionY));
+            if(this->getActionNode()->getParent())
+            {
+                actionFrame->setPosition(Point(positionX, positionY)+this->getActionNode()->getParent()->getAnchorPointInPoints());
+            }
+            else
+            {
+                actionFrame->setPosition(Point(positionX, positionY));
+            }
             auto cActionArray = _frameArray.at((int)kKeyframeMove);
             cActionArray->pushBack(actionFrame);
             actionFrame->release();
@@ -165,7 +173,6 @@ void ActionNode::initWithDictionary(const rapidjson::Value& dic, Ref* root)
             actionFrame->release();
         }
     }
-    initActionNodeFromRoot(root);
 }
 
 void ActionNode::initActionNodeFromRoot(Ref* root)

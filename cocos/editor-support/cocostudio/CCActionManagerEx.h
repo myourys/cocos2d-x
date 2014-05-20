@@ -29,6 +29,22 @@ THE SOFTWARE.
 #include "cocostudio/DictionaryHelper.h"
 
 namespace cocostudio {
+    
+class ActionManagerEx;
+    
+class ActionWrap: public cocos2d::ActionInterval
+{
+public:
+    ActionWrap():_node(nullptr){};
+    static cocos2d::Action* createWrap(cocos2d::Ref* node);
+    virtual ActionWrap* reverse() const {return nullptr;};
+    virtual ActionWrap* clone() const {return nullptr;};
+    
+    virtual void update(float t) {};
+    virtual ~ActionWrap();
+private:
+    cocos2d::Ref* _node;
+};
 
 class ActionManagerEx:public cocos2d::Ref
 {
@@ -70,7 +86,7 @@ public:
 	*
 	* @return  ActionObject which named as the param name
 	*/
-	ActionObject* getActionByName(const char* jsonName,const char* actionName);
+	ActionObject* getActionByName(Ref* root,const char* actionName);
 
 	/**
 	* Play an Action with a name.
@@ -81,7 +97,7 @@ public:
 	*
 	* @return  ActionObject which named as the param name
 	*/
-	ActionObject* playActionByName(const char* jsonName,const char* actionName);
+	ActionObject* playActionByName(Ref* root,const char* actionName);
 
 	/**
 	* Play an Action with a name.
@@ -92,10 +108,12 @@ public:
 	*
 	* @param func ui action call back
 	*/
-	ActionObject* playActionByName(const char* jsonName,const char* actionName, cocos2d::CallFunc* func);
+	ActionObject* playActionByName(Ref* root,const char* actionName, cocos2d::CallFunc* func);
 
 	/*init properties with json dictionay*/
 	void initWithDictionary(const char* jsonName,const rapidjson::Value &dic, Ref* root);
+    
+    void releaseAction(Ref* root);
 	/**
 	* Release all actions.
 	*
@@ -103,7 +121,7 @@ public:
 	void releaseActions();
 
 protected:
-	std::unordered_map<std::string, cocos2d::Vector<ActionObject*>> _actionDic;
+	std::unordered_map<Ref*, cocos2d::Vector<ActionObject*>> _actionDic;
 };
 
 }

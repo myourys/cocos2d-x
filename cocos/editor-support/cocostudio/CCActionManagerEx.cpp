@@ -28,6 +28,28 @@ THE SOFTWARE.
 using namespace cocos2d;
 
 namespace cocostudio {
+    
+Action* ActionWrap::createWrap(cocos2d::Ref* node)
+{
+    ActionWrap *ret = new ActionWrap();
+    
+    if (ret )
+    {
+        ret->_node = node;
+        ret->autorelease();
+        return RepeatForever::create(ret);
+    }
+    else
+    {
+        CC_SAFE_DELETE(ret);
+        return nullptr;
+    }
+}
+
+ActionWrap::~ActionWrap()
+{
+    ActionManagerEx::getInstance()->releaseAction(_node);
+}
 
 static ActionManagerEx* sharedActionManager = nullptr;
 
@@ -68,13 +90,14 @@ void ActionManagerEx::initWithDictionary(const char* jsonName,const rapidjson::V
 		action->initWithDictionary(actionDic,root);
 		actionList.pushBack(action);
 	}
-	_actionDic.insert(std::pair<std::string, cocos2d::Vector<ActionObject*>>(fileName, actionList));
+    dynamic_cast<Node*>(root)->runAction(ActionWrap::createWrap(root));
+	_actionDic.insert(std::pair<Ref*, cocos2d::Vector<ActionObject*>>(root, actionList));
 }
 
 
-ActionObject* ActionManagerEx::getActionByName(const char* jsonName,const char* actionName)
+ActionObject* ActionManagerEx::getActionByName(Ref* root,const char* actionName)
 {
-	auto iterator = _actionDic.find(jsonName);
+	auto iterator = _actionDic.find(root);
 	if (iterator == _actionDic.end())
 	{
 		return nullptr;
@@ -91,9 +114,9 @@ ActionObject* ActionManagerEx::getActionByName(const char* jsonName,const char* 
 	return nullptr;
 }
 
-ActionObject* ActionManagerEx::playActionByName(const char* jsonName,const char* actionName)
+ActionObject* ActionManagerEx::playActionByName(Ref* root,const char* actionName)
 {
-	ActionObject* action = getActionByName(jsonName,actionName);
+	ActionObject* action = getActionByName(root,actionName);
 	if (action)
 	{
 		action->play();
@@ -101,9 +124,9 @@ ActionObject* ActionManagerEx::playActionByName(const char* jsonName,const char*
 	return action;
 }
 
-ActionObject* ActionManagerEx::playActionByName(const char* jsonName,const char* actionName, CallFunc* func)
+ActionObject* ActionManagerEx::playActionByName(Ref* root,const char* actionName, CallFunc* func)
 {
-	ActionObject* action = getActionByName(jsonName,actionName);
+	ActionObject* action = getActionByName(root,actionName);
 	if (action)
 	{
 		action->play(func);
@@ -111,13 +134,31 @@ ActionObject* ActionManagerEx::playActionByName(const char* jsonName,const char*
 	return action;
 }
     
+void ActionManagerEx::releaseAction(Ref* root)
+{
+    auto iterator = _actionDic.find(root);
+	if (iterator == _actionDic.end())
+	{
+		return;
+	}
+	auto actionList = iterator->second;
+    for (auto & action:actionList) {
+        action->stop();
+    }
+    actionList.clear();
+    _actionDic.erase(root);
+}
+    
 void ActionManagerEx::releaseActions()
 {
-    std::unordered_map<std::string, cocos2d::Vector<ActionObject*>>::iterator iter;
+    std::unordered_map<Ref*, cocos2d::Vector<ActionObject*>>::iterator iter;
     for (iter = _actionDic.begin(); iter != _actionDic.end(); iter++)
     {
         cocos2d::Vector<ActionObject*> objList = iter->second;
         objList.clear();
+        for (auto & action:objList) {
+            action->stop();
+        }
     }
     
     _actionDic.clear();

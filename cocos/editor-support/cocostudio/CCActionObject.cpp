@@ -50,6 +50,8 @@ ActionObject::ActionObject()
 
 ActionObject::~ActionObject()
 {
+    this->stop();
+    CC_SAFE_RELEASE(_CallBack);
 	_actionNodeList.clear();
 	CC_SAFE_RELEASE(_pScheduler);
 }
@@ -135,6 +137,7 @@ void ActionObject::addActionNode(ActionNode* node)
 	_actionNodeList.pushBack(node);
 	node->setUnitTime(_fUnitTime);
 }
+    
 void ActionObject::removeActionNode(ActionNode* node)
 {
 	if (node == nullptr)
@@ -146,25 +149,21 @@ void ActionObject::removeActionNode(ActionNode* node)
 
 void ActionObject::play()
 {
-	stop();
+    if(_bPlaying)
+        return;
 	this->updateToFrameByTime(0.0f);
     for(const auto &e : _actionNodeList)
 	{
 		e->playAction();
 	}
-	if (_loop)
-	{
-		_pScheduler->schedule(schedule_selector(ActionObject::simulationActionUpdate), this, 0.0f , kRepeatForever, 0.0f, false);
-	}
-	else
-	{
-		_pScheduler->schedule(schedule_selector(ActionObject::simulationActionUpdate), this, 0.0f, false);
-	}
+	_pScheduler->schedule(schedule_selector(ActionObject::simulationActionUpdate), this, 0.0f , kRepeatForever, 0.0f, false);
+    _bPlaying = true;
 }
 
 void ActionObject::play(CallFunc* func)
 {
 	this->play();
+    func->retain();
 	this->_CallBack = func;
 }
 void ActionObject::pause()
@@ -174,12 +173,17 @@ void ActionObject::pause()
 
 void ActionObject::stop()
 {
+    if (!_bPlaying) {
+        return;
+    }
     for(const auto &e : _actionNodeList)
 	{
-		e->stopAction();
+		if (!e->isActionDoneOnce())
+            e->stopAction();
 	}
 	_pScheduler->unschedule(schedule_selector(ActionObject::simulationActionUpdate), this);
 	_bPause = false;
+    _bPlaying = false;
 }
 
 void ActionObject::updateToFrameByTime(float fTime)
@@ -212,8 +216,16 @@ void ActionObject::simulationActionUpdate(float dt)
 		}
 		if (_loop)
 		{
-			this->play();
+            this->updateToFrameByTime(0.0f);
+            for(const auto &e : _actionNodeList)
+            {
+                e->playAction();
+            }
 		}
+        else
+        {
+            this->stop();
+        }
 	}
 }
 }
