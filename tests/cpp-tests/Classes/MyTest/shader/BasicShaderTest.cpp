@@ -12,6 +12,15 @@
 
 #define STRINGIFY(A)  #A
 
+
+Layer* nextBasicShaderTest();
+Layer* backBasicShaderTest();
+Layer* restartBasicShaderTest();
+
+static int sceneIdx = -1;
+
+#define MAX_LAYER    2
+
 const char* s_PositionTextureColor_vert = STRINGIFY(
                                                     
 attribute vec4 a_position;
@@ -30,19 +39,13 @@ void main()
                                                     
 );
 
-Layer* nextBasicShaderTest();
-Layer* backBasicShaderTest();
-Layer* restartBasicShaderTest();
-
-static int sceneIdx = -1;
-
-#define MAX_LAYER    1
 
 Layer* createBasicShaderTestLayer(int nIndex)
 {
     switch(nIndex)
     {
         case 0: return new GrayTest();
+        case 1: return new InvertTest();
     }
     
     return nullptr;
@@ -133,7 +136,7 @@ void BasicShaderTest::backCallback(Ref* sender)
 //
 //------------------------------------------------------------------
 
-const char* s_TextureGray_flag = STRINGIFY(
+const char* s_TextureGray_frag = STRINGIFY(
 
 varying vec4 v_fragmentColor;
 varying vec2 v_texCoord;
@@ -160,7 +163,7 @@ void GrayTest::onEnter()
     this->addChild(right);
     
     auto graySprite = [](Sprite* sprite){
-        auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureGray_flag);
+        auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureGray_frag);
         auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
         sprite->setGLProgramState(glprogramstate);
     };
@@ -172,6 +175,54 @@ std::string GrayTest::subtitle() const
 {
     return "Test 1. Gray Shader Test";
 }
+
+//------------------------------------------------------------------
+//
+// GrayTest
+//
+//------------------------------------------------------------------
+
+const char* s_TextureInvert_frag = STRINGIFY(
+varying vec4 v_fragmentColor;
+varying vec2 v_texCoord;
+
+void main()
+{
+	vec4 nomalColor = texture2D(CC_Texture0, v_texCoord);
+    gl_FragColor = vec4(1.0 - nomalColor.r,1.0 - nomalColor.b,1.0 - nomalColor.g,1.0);
+}
+);
+                                             
+
+                                           
+
+
+void InvertTest::onEnter()
+{
+    BasicShaderTest::onEnter();
+    
+    auto left = Sprite::create(s_Power);
+    auto right = Sprite::create(s_Power);
+    
+    left->setPosition(VisibleRect::center() - Vec2(80,0));
+    right->setPosition(VisibleRect::center() + Vec2(80,0));
+    this->addChild(left);
+    this->addChild(right);
+    
+    auto InvertSprite = [](Sprite* sprite){
+        auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureInvert_frag);
+        auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
+        sprite->setGLProgramState(glprogramstate);
+    };
+    
+    InvertSprite(right);
+}
+
+std::string InvertTest::subtitle() const
+{
+    return "Test 2. InvertTest Shader Test";
+}
+
 
 
 //------------------------------------------------------------------

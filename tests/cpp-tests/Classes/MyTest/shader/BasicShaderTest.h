@@ -36,6 +36,14 @@ public:
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
 };
+
+class InvertTest : public BasicShaderTest
+{
+public:
+    virtual std::string subtitle() const override;
+    virtual void onEnter() override;
+};
+
  
 
 class BasicShaderTestScene : public TestScene
