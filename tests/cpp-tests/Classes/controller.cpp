@@ -34,6 +34,7 @@ Controller g_aTestNames[] = {
     // TESTS MUST BE ORDERED ALPHABETICALLY
     //     violators will be prosecuted
     //
+    { "MyTest", [](){return new MyTestScene(); } },
 	{ "ActionManager", [](){return new ActionManagerTestScene(); } },
 	{ "Actions - Basic", [](){ return new ActionsTestScene(); } },
 	{ "Actions - Ease", [](){return new ActionsEaseTestScene();} },
