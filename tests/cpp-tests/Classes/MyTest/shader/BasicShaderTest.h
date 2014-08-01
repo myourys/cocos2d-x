@@ -29,50 +29,83 @@ public:
     void nextCallback(Ref* sender);
     void backCallback(Ref* sender);
 };
-
+/**
+ *  灰图
+ */
 class GrayTest : public BasicShaderTest
 {
 public:
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
 };
-
+/**
+ *  负片
+ */
 class InvertTest : public BasicShaderTest
 {
 public:
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
 };
-
+/**
+ *  黑白
+ */
 class BlackWhiteTest : public BasicShaderTest
 {
 public:
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
 };
-
+/**
+ *  浮雕
+ */
 class ReliefTest : public BasicShaderTest
 {
 public:
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
 };
-
+/**
+ *  平滑效果
+ */
 class SmothTest : public BasicShaderTest
 {
 public:
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
 };
-
+/**
+ *  曝光效果
+ */
 class ExposureTest : public BasicShaderTest
 {
 public:
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
 };
-
+/**
+ *  霓虹效果
+ */
 class NeonTest : public BasicShaderTest
+{
+public:
+    virtual std::string subtitle() const override;
+    virtual void onEnter() override;
+};
+
+/**
+ *  中毒效果
+ */
+class PoisonTest : public BasicShaderTest
+{
+public:
+    virtual std::string subtitle() const override;
+    virtual void onEnter() override;
+};
+/**
+ *  冰冻效果
+ */
+class FrozenTest : public BasicShaderTest
 {
 public:
     virtual std::string subtitle() const override;

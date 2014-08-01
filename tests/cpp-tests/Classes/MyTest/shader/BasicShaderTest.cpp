@@ -19,7 +19,7 @@ Layer* restartBasicShaderTest();
 
 static int sceneIdx = -1;
 
-#define MAX_LAYER    7
+#define MAX_LAYER    9
 
 const char* s_PositionTextureColor_vert = STRINGIFY(
                                                     
@@ -51,6 +51,8 @@ Layer* createBasicShaderTestLayer(int nIndex)
         case 4: return new SmothTest();
         case 5: return new ExposureTest();
         case 6: return new NeonTest();
+        case 7: return new PoisonTest();
+        case 8: return new FrozenTest();
     }
     
     return nullptr;
@@ -167,13 +169,13 @@ void GrayTest::onEnter()
     this->addChild(left);
     this->addChild(right);
     
-    auto graySprite = [](Sprite* sprite){
+    auto shaderSprite = [](Sprite* sprite){
         auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureGray_frag);
         auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
         sprite->setGLProgramState(glprogramstate);
     };
     
-    graySprite(right);
+    shaderSprite(right);
 }
 
 std::string GrayTest::subtitle() const
@@ -212,13 +214,13 @@ void InvertTest::onEnter()
     this->addChild(left);
     this->addChild(right);
     
-    auto InvertSprite = [](Sprite* sprite){
+    auto shaderSprite = [](Sprite* sprite){
         auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureInvert_frag);
         auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
         sprite->setGLProgramState(glprogramstate);
     };
     
-    InvertSprite(right);
+    shaderSprite(right);
 }
 
 std::string InvertTest::subtitle() const
@@ -263,13 +265,13 @@ void BlackWhiteTest::onEnter()
     this->addChild(left);
     this->addChild(right);
     
-    auto BlackWhiteSprite = [](Sprite* sprite){
+    auto shaderSprite = [](Sprite* sprite){
         auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureBlackWhite_frag);
         auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
         sprite->setGLProgramState(glprogramstate);
     };
     
-    BlackWhiteSprite(right);
+    shaderSprite(right);
 }
 
 std::string BlackWhiteTest::subtitle() const
@@ -314,7 +316,7 @@ void ReliefTest::onEnter()
     this->addChild(left);
     this->addChild(right);
     
-    auto BlackWhiteSprite = [](Sprite* sprite){
+    auto shaderSprite = [](Sprite* sprite){
         auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureRelief_frag);
         auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
         //glprogram->setUniformLocationWith2f(glprogram->getUniformLocation("v_texSize"),
@@ -323,7 +325,7 @@ void ReliefTest::onEnter()
         sprite->setGLProgramState(glprogramstate);
     };
     
-    BlackWhiteSprite(right);
+    shaderSprite(right);
 }
 
 std::string ReliefTest::subtitle() const
@@ -376,14 +378,14 @@ void SmothTest::onEnter()
     this->addChild(left);
     this->addChild(right);
     
-    auto BlackWhiteSprite = [](Sprite* sprite){
+    auto shaderSprite = [](Sprite* sprite){
         auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureSmoth_frag);
         auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
         glprogramstate->setUniformVec2("v_texSize", sprite->getContentSize());
         sprite->setGLProgramState(glprogramstate);
     };
     
-    BlackWhiteSprite(right);
+    shaderSprite(right);
 }
 
 std::string SmothTest::subtitle() const
@@ -432,13 +434,13 @@ void ExposureTest::onEnter()
     this->addChild(left);
     this->addChild(right);
     
-    auto BlackWhiteSprite = [](Sprite* sprite){
+    auto shaderSprite = [](Sprite* sprite){
         auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureExposure_frag);
         auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
         sprite->setGLProgramState(glprogramstate);
     };
     
-    BlackWhiteSprite(right);
+    shaderSprite(right);
 }
 
 std::string ExposureTest::subtitle() const
@@ -492,20 +494,119 @@ void NeonTest::onEnter()
     this->addChild(left);
     this->addChild(right);
     
-    auto BlackWhiteSprite = [](Sprite* sprite){
+    auto shaderSprite = [](Sprite* sprite){
         auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureNeon_frag);
         auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
         glprogramstate->setUniformVec2("v_texSize", sprite->getContentSize());
         sprite->setGLProgramState(glprogramstate);
     };
     
-    BlackWhiteSprite(right);
+    shaderSprite(right);
 }
 
 std::string NeonTest::subtitle() const
 {
     return "Test 7. Neon Shader Test";
 }
+
+
+//------------------------------------------------------------------
+//
+// PoisonTest
+//
+//------------------------------------------------------------------
+const char* s_TexturePoison_frag = STRINGIFY(
+#ifdef GL_ES
+precision mediump float;
+#endif
+varying vec2 v_texCoord;
+varying vec4 v_fragmentColor;
+void main()
+{
+    gl_FragColor = texture2D(CC_Texture0, v_texCoord) * v_fragmentColor;
+    gl_FragColor.r *= 0.8; 
+    gl_FragColor.r += 0.08 * gl_FragColor.a; 
+    gl_FragColor.g *= 0.8; 
+    gl_FragColor.b *= 0.8; 
+    gl_FragColor.g += 0.2 * gl_FragColor.a;
+}
+                                           );
+
+void PoisonTest::onEnter()
+{
+    BasicShaderTest::onEnter();
+    
+    auto left = Sprite::create(s_Power);
+    auto right = Sprite::create(s_Power);
+    
+    left->setPosition(VisibleRect::center() - Vec2(80,0));
+    right->setPosition(VisibleRect::center() + Vec2(80,0));
+    this->addChild(left);
+    this->addChild(right);
+    
+    auto shaderSprite = [](Sprite* sprite){
+        auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TexturePoison_frag);
+        auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
+        sprite->setGLProgramState(glprogramstate);
+    };
+    
+    shaderSprite(right);
+}
+
+std::string PoisonTest::subtitle() const
+{
+    return "Test 8. Poison Shader Test";
+}
+
+//------------------------------------------------------------------
+//
+// FrozenTest
+//
+//------------------------------------------------------------------
+const char* s_TextureFrozen_frag = STRINGIFY(
+#ifdef GL_ES
+precision mediump float;
+#endif
+varying vec2 v_texCoord;
+varying vec4 v_fragmentColor;
+void main(void)
+{
+    vec4 normalColor = v_fragmentColor * texture2D(CC_Texture0, v_texCoord);
+	normalColor *= vec4(0.8, 0.8, 0.8, 1);
+	normalColor.b += normalColor.a * 0.2;
+    gl_FragColor = normalColor;
+}
+
+
+);
+
+void FrozenTest::onEnter()
+{
+    BasicShaderTest::onEnter();
+    
+    auto left = Sprite::create(s_Power);
+    auto right = Sprite::create(s_Power);
+    
+    left->setPosition(VisibleRect::center() - Vec2(80,0));
+    right->setPosition(VisibleRect::center() + Vec2(80,0));
+    this->addChild(left);
+    this->addChild(right);
+    
+    auto shaderSprite = [](Sprite* sprite){
+        auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureFrozen_frag);
+        auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
+        sprite->setGLProgramState(glprogramstate);
+    };
+    
+    shaderSprite(right);
+}
+
+std::string FrozenTest::subtitle() const
+{
+    return "Test 9. Frozen Shader Test";
+}
+
+
 
 //------------------------------------------------------------------
 //
