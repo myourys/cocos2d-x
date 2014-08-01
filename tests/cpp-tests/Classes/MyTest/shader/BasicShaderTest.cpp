@@ -19,7 +19,7 @@ Layer* restartBasicShaderTest();
 
 static int sceneIdx = -1;
 
-#define MAX_LAYER    2
+#define MAX_LAYER    4
 
 const char* s_PositionTextureColor_vert = STRINGIFY(
                                                     
@@ -46,6 +46,8 @@ Layer* createBasicShaderTestLayer(int nIndex)
     {
         case 0: return new GrayTest();
         case 1: return new InvertTest();
+        case 2: return new BlackWhiteTest();
+        case 3: return new ReliefTest();
     }
     
     return nullptr;
@@ -178,7 +180,7 @@ std::string GrayTest::subtitle() const
 
 //------------------------------------------------------------------
 //
-// GrayTest
+// InvertTest
 //
 //------------------------------------------------------------------
 
@@ -193,9 +195,7 @@ void main()
 }
 );
                                              
-
-                                           
-
+                                        
 
 void InvertTest::onEnter()
 {
@@ -221,6 +221,111 @@ void InvertTest::onEnter()
 std::string InvertTest::subtitle() const
 {
     return "Test 2. InvertTest Shader Test";
+}
+
+//------------------------------------------------------------------
+//
+// BlackWhiteTest
+//
+//------------------------------------------------------------------
+const char* s_TextureBlackWhite_frag = STRINGIFY(
+    
+    varying vec4 v_fragmentColor;
+    varying vec2 v_texCoord;
+    
+    void main()
+    {
+        vec4 color;
+        color = texture2D(CC_Texture0, v_texCoord);
+        if ((color.r + color.g + color.b)/3.0 > 100.0/255.0) {
+            color.rgb = vec3(1);
+        }
+        else{
+            color.rgb = vec3(0);
+        }
+        gl_FragColor = vec4(color.rgb, 1);
+    }
+                                                 
+);
+
+void BlackWhiteTest::onEnter()
+{
+    BasicShaderTest::onEnter();
+    
+    auto left = Sprite::create(s_Power);
+    auto right = Sprite::create(s_Power);
+    
+    left->setPosition(VisibleRect::center() - Vec2(80,0));
+    right->setPosition(VisibleRect::center() + Vec2(80,0));
+    this->addChild(left);
+    this->addChild(right);
+    
+    auto BlackWhiteSprite = [](Sprite* sprite){
+        auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureBlackWhite_frag);
+        auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
+        sprite->setGLProgramState(glprogramstate);
+    };
+    
+    BlackWhiteSprite(right);
+}
+
+std::string BlackWhiteTest::subtitle() const
+{
+    return "Test 3. BlackWhiteTest Shader Test";
+}
+
+//------------------------------------------------------------------
+//
+// ReliefTest
+//
+//------------------------------------------------------------------
+const char* s_TextureRelief_frag = STRINGIFY(
+varying vec2 v_texCoord;
+// image's size
+uniform vec2 v_texSize;
+
+void main()
+{
+    vec2 onePixel = vec2(1.0 / v_texSize.r, 1.0 / v_texSize.g);
+    
+    vec4 color;
+    color.rgb = vec3(0.5);
+    color -= texture2D(CC_Texture0, v_texCoord - onePixel) * 5.0;
+    color += texture2D(CC_Texture0, v_texCoord + onePixel) * 5.0;
+    
+    color.rgb = vec3((color.r + color.g + color.b) / 3.0);
+    gl_FragColor = vec4(color.rgb, 1);
+}
+                                                 
+);
+
+void ReliefTest::onEnter()
+{
+    BasicShaderTest::onEnter();
+    
+    auto left = Sprite::create(s_Power);
+    auto right = Sprite::create(s_Power);
+    
+    left->setPosition(VisibleRect::center() - Vec2(80,0));
+    right->setPosition(VisibleRect::center() + Vec2(80,0));
+    this->addChild(left);
+    this->addChild(right);
+    
+    auto BlackWhiteSprite = [](Sprite* sprite){
+        auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureRelief_frag);
+        auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
+        //glprogram->setUniformLocationWith2f(glprogram->getUniformLocation("v_texSize"),
+        //                                    sprite->getContentSize().width, sprite->getContentSize().height);
+        glprogramstate->setUniformVec2("v_texSize", sprite->getContentSize());
+        sprite->setGLProgramState(glprogramstate);
+    };
+    
+    BlackWhiteSprite(right);
+}
+
+std::string ReliefTest::subtitle() const
+{
+    return "Test 4. ReliefTest Shader Test";
 }
 
 

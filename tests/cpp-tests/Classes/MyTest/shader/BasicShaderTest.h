@@ -44,7 +44,19 @@ public:
     virtual void onEnter() override;
 };
 
- 
+class BlackWhiteTest : public BasicShaderTest
+{
+public:
+    virtual std::string subtitle() const override;
+    virtual void onEnter() override;
+};
+
+class ReliefTest : public BasicShaderTest
+{
+public:
+    virtual std::string subtitle() const override;
+    virtual void onEnter() override;
+};
 
 class BasicShaderTestScene : public TestScene
 {
