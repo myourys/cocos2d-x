@@ -19,7 +19,7 @@ Layer* restartBasicShaderTest();
 
 static int sceneIdx = -1;
 
-#define MAX_LAYER    9
+#define MAX_LAYER    14
 
 const char* s_PositionTextureColor_vert = STRINGIFY(
                                                     
@@ -53,6 +53,11 @@ Layer* createBasicShaderTestLayer(int nIndex)
         case 6: return new NeonTest();
         case 7: return new PoisonTest();
         case 8: return new FrozenTest();
+        case 9: return new StoneTest();
+        case 10: return new BanishTest();
+        case 11: return new BlurTest();
+        case 12: return new MirrorTest();
+        case 13: return new IceTest();
     }
     
     return nullptr;
@@ -607,6 +612,278 @@ std::string FrozenTest::subtitle() const
 }
 
 
+//------------------------------------------------------------------
+//
+// FrozenTest
+//
+//------------------------------------------------------------------
+const char* s_TextureStone_frag = STRINGIFY(
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+varying vec4 v_fragmentColor;
+varying vec2 v_texCoord;
+uniform sampler2D u_texture;
+
+void main()
+{
+    vec4 color1 = texture2D(CC_Texture0, v_texCoord) * v_fragmentColor;
+	float brightness = (color1.r + color1.g + color1.b) * (1. / 3.);
+	float gray = (0.6) * brightness;
+    gl_FragColor = vec4(gray, gray, gray, color1.a);
+}
+                                             
+                                             );
+
+void StoneTest::onEnter()
+{
+    BasicShaderTest::onEnter();
+    
+    auto left = Sprite::create(s_Power);
+    auto right = Sprite::create(s_Power);
+    
+    left->setPosition(VisibleRect::center() - Vec2(80,0));
+    right->setPosition(VisibleRect::center() + Vec2(80,0));
+    this->addChild(left);
+    this->addChild(right);
+    
+    auto shaderSprite = [](Sprite* sprite){
+        auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureStone_frag);
+        auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
+        sprite->setGLProgramState(glprogramstate);
+    };
+    
+    shaderSprite(right);
+}
+
+std::string StoneTest::subtitle() const
+{
+    return "Test 10. Stone Shader Test";
+}
+
+
+//------------------------------------------------------------------
+//
+// BanishTest
+//
+//------------------------------------------------------------------
+const char* s_TextureBanish_frag = STRINGIFY(
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+varying vec4 v_fragmentColor;
+varying vec2 v_texCoord;
+
+void main()
+{
+	gl_FragColor = texture2D(CC_Texture0, v_texCoord) * v_fragmentColor;
+	float gray = (gl_FragColor.r + gl_FragColor.g + gl_FragColor.b) * (1.0 / 3.0);
+	gl_FragColor = vec4(gray * 0.9, gray * 1.2, gray * 0.8, gl_FragColor.a * (gray + 0.1));
+}
+                                        
+);
+
+void BanishTest::onEnter()
+{
+    BasicShaderTest::onEnter();
+    
+    auto left = Sprite::create(s_Power);
+    auto right = Sprite::create(s_Power);
+    
+    left->setPosition(VisibleRect::center() - Vec2(80,0));
+    right->setPosition(VisibleRect::center() + Vec2(80,0));
+    this->addChild(left);
+    this->addChild(right);
+    
+    auto shaderSprite = [](Sprite* sprite){
+        auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureBanish_frag);
+        auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
+        sprite->setGLProgramState(glprogramstate);
+    };
+    
+    shaderSprite(right);
+}
+
+std::string BanishTest::subtitle() const
+{
+    return "Test 11. Banish Shader Test";
+}
+
+//------------------------------------------------------------------
+//
+// BlurTest
+//
+//------------------------------------------------------------------
+const char* s_TextureBlur_frag = STRINGIFY(
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+varying vec4 v_fragmentColor;
+varying vec2 v_texCoord;
+
+uniform vec2 blurSize;
+
+void main() {
+   vec4 sum = vec4(0.0);
+   vec4 substract = vec4(0,0,0,0);
+   
+   float alpha = texture2D(CC_Texture0 , v_texCoord).a;
+   
+   sum += texture2D(CC_Texture0, v_texCoord - 4.0 * blurSize) * 0.05;
+   sum += texture2D(CC_Texture0, v_texCoord - 3.0 * blurSize) * 0.09;
+   sum += texture2D(CC_Texture0, v_texCoord - 2.0 * blurSize) * 0.12;
+   sum += texture2D(CC_Texture0, v_texCoord - 1.0 * blurSize) * 0.15;
+   sum += texture2D(CC_Texture0, v_texCoord                 ) * 0.16;
+   sum += texture2D(CC_Texture0, v_texCoord + 1.0 * blurSize) * 0.15;
+   sum += texture2D(CC_Texture0, v_texCoord + 2.0 * blurSize) * 0.12;
+   sum += texture2D(CC_Texture0, v_texCoord + 3.0 * blurSize) * 0.09;
+   sum += texture2D(CC_Texture0, v_texCoord + 4.0 * blurSize) * 0.05;
+   
+   vec4 temp = vec4(0,0,0,0);
+   temp = (sum - substract) * v_fragmentColor;
+   
+   if(alpha < 0.05)
+   {
+       gl_FragColor = vec4(0 , 0 , 0 , 0);
+   }
+   else
+   {
+       gl_FragColor = temp;
+   }
+}
+ );
+
+void BlurTest::onEnter()
+{
+    BasicShaderTest::onEnter();
+    
+    auto left = Sprite::create(s_Power);
+    auto right = Sprite::create(s_Power);
+    
+    left->setPosition(VisibleRect::center() - Vec2(80,0));
+    right->setPosition(VisibleRect::center() + Vec2(80,0));
+    this->addChild(left);
+    this->addChild(right);
+    
+    auto shaderSprite = [](Sprite* sprite){
+        auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureBlur_frag);
+        auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
+        glprogramstate->setUniformVec2("blurSize",Vec2( 1.0/ sprite->getContentSize().width,1.0/ sprite->getContentSize().height));
+        sprite->setGLProgramState(glprogramstate);
+    };
+    
+    shaderSprite(right);
+}
+
+std::string BlurTest::subtitle() const
+{
+    return "Test 12. Blur Shader Test";
+}
+
+
+//------------------------------------------------------------------
+//
+// MirrorTest
+//
+//------------------------------------------------------------------
+const char* s_TextureMirror_frag = STRINGIFY(
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+varying vec4 v_fragmentColor;
+varying vec2 v_texCoord;
+
+void main()
+{
+    vec4 normalColor = v_fragmentColor * texture2D(CC_Texture0, v_texCoord);
+    normalColor.r = normalColor.r * 0.5;
+    normalColor.g = normalColor.g * 0.8;
+    normalColor.b = normalColor.b + normalColor.a * 0.2;
+    gl_FragColor = normalColor;
+}
+                                             
+                                          
+);
+
+void MirrorTest::onEnter()
+{
+    BasicShaderTest::onEnter();
+    
+    auto left = Sprite::create(s_Power);
+    auto right = Sprite::create(s_Power);
+    
+    left->setPosition(VisibleRect::center() - Vec2(80,0));
+    right->setPosition(VisibleRect::center() + Vec2(80,0));
+    this->addChild(left);
+    this->addChild(right);
+    
+    auto shaderSprite = [](Sprite* sprite){
+        auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureMirror_frag);
+        auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
+        sprite->setGLProgramState(glprogramstate);
+    };
+    
+    shaderSprite(right);
+}
+
+std::string MirrorTest::subtitle() const
+{
+    return "Test 13. Mirror Shader Test";
+}
+
+//------------------------------------------------------------------
+//
+// IceTest
+//
+//------------------------------------------------------------------
+const char* s_TextureIce_frag = STRINGIFY(
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+varying vec4 v_fragmentColor;
+varying vec2 v_texCoord;
+
+void main()
+{
+    vec4 color1 = texture2D(CC_Texture0, v_texCoord) * v_fragmentColor;
+	float brightness = (color1.r + color1.g + color1.b) * (1. / 3.);
+	float gray = (1.5)*brightness;
+	color1 = vec4(gray, gray, gray, color1.a)*vec4(0.8,1.2,1.5,1);
+    gl_FragColor =color1;
+}
+                                             
+);
+
+void IceTest::onEnter()
+{
+    BasicShaderTest::onEnter();
+    
+    auto left = Sprite::create(s_Power);
+    auto right = Sprite::create(s_Power);
+    
+    left->setPosition(VisibleRect::center() - Vec2(80,0));
+    right->setPosition(VisibleRect::center() + Vec2(80,0));
+    this->addChild(left);
+    this->addChild(right);
+    
+    auto shaderSprite = [](Sprite* sprite){
+        auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureIce_frag);
+        auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
+        sprite->setGLProgramState(glprogramstate);
+    };
+    
+    shaderSprite(right);
+}
+
+std::string IceTest::subtitle() const
+{
+    return "Test 14. Ice Shader Test";
+}
 
 //------------------------------------------------------------------
 //

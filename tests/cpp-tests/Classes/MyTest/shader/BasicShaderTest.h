@@ -111,6 +111,48 @@ public:
     virtual std::string subtitle() const override;
     virtual void onEnter() override;
 };
+/**
+ *  石化效果
+ */
+class StoneTest : public BasicShaderTest
+{
+public:
+    virtual std::string subtitle() const override;
+    virtual void onEnter() override;
+};
+
+class BanishTest : public BasicShaderTest
+{
+public:
+    virtual std::string subtitle() const override;
+    virtual void onEnter() override;
+};
+/**
+ *  高度模糊
+ */
+class BlurTest : public BasicShaderTest
+{
+public:
+    virtual std::string subtitle() const override;
+    virtual void onEnter() override;
+};
+
+
+class MirrorTest : public BasicShaderTest
+{
+public:
+    virtual std::string subtitle() const override;
+    virtual void onEnter() override;
+};
+/**
+ *  冰冻
+ */
+class IceTest : public BasicShaderTest
+{
+public:
+    virtual std::string subtitle() const override;
+    virtual void onEnter() override;
+};
 
 
 class BasicShaderTestScene : public TestScene
