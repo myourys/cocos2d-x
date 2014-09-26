@@ -19,7 +19,7 @@ Layer* restartBasicShaderTest();
 
 static int sceneIdx = -1;
 
-#define MAX_LAYER    14
+#define MAX_LAYER    15
 
 const char* s_PositionTextureColor_vert = STRINGIFY(
                                                     
@@ -58,6 +58,7 @@ Layer* createBasicShaderTestLayer(int nIndex)
         case 11: return new BlurTest();
         case 12: return new MirrorTest();
         case 13: return new IceTest();
+        case 14: return new RGBTest();
     }
     
     return nullptr;
@@ -883,6 +884,60 @@ void IceTest::onEnter()
 std::string IceTest::subtitle() const
 {
     return "Test 14. Ice Shader Test";
+}
+
+
+//------------------------------------------------------------------
+//
+// RGBTest
+//
+//------------------------------------------------------------------
+const char* s_TextureRGB_frag = STRINGIFY(
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+varying vec4 v_fragmentColor;
+varying vec2 v_texCoord;
+
+void main()
+{
+    vec4 color1 = texture2D(CC_Texture0, v_texCoord) * v_fragmentColor;
+    vec4 color2 = color1;
+    color2.rgb = vec3(251.0/255.0,182.0/255.0,52.0/255.0) * color1.r +
+    vec3(255.0/255.0,247.0/255.0,153.0/255.0) *  color1.g +
+    vec3(149.0/255.0,148.0/255.0,120.0/255.0) * color1.b;
+    
+    gl_FragColor = color2;
+}
+                                          
+);
+
+void RGBTest::onEnter()
+{
+    BasicShaderTest::onEnter();
+    const char* s_rgb = "mytest/rgb.png";
+    auto left = Sprite::create(s_rgb);
+    auto right = Sprite::create(s_rgb);
+    
+    left->setPosition(VisibleRect::center() - Vec2(0,50));
+    right->setPosition(VisibleRect::center() + Vec2(0,50));
+    this->addChild(left);
+    this->addChild(right);
+    
+    auto shaderSprite = [](Sprite* sprite){
+        auto glprogram = GLProgram::createWithByteArrays(s_PositionTextureColor_vert, s_TextureRGB_frag);
+        auto glprogramstate = GLProgramState::getOrCreateWithGLProgram(glprogram);
+        sprite->setGLProgramState(glprogramstate);
+        sprite->getTexture()->setAntiAliasTexParameters();
+    };
+    
+    shaderSprite(right);
+}
+
+std::string RGBTest::subtitle() const
+{
+    return "Test 15. RGB Shader Test";
 }
 
 //------------------------------------------------------------------

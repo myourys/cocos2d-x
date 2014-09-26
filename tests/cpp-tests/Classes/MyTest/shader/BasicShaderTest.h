@@ -154,6 +154,16 @@ public:
     virtual void onEnter() override;
 };
 
+/**
+ *  RGB
+ */
+class RGBTest : public BasicShaderTest
+{
+public:
+    virtual std::string subtitle() const override;
+    virtual void onEnter() override;
+};
+
 
 class BasicShaderTestScene : public TestScene
 {

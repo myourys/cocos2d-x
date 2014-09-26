@@ -965,6 +965,8 @@
 		C44227321987AE5800CFA98F /* MyTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C442272C1987AE5800CFA98F /* MyTest.cpp */; };
 		C44227331987AE5800CFA98F /* BasicShaderTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C442272F1987AE5800CFA98F /* BasicShaderTest.cpp */; };
 		C44227341987AE5800CFA98F /* BasicShaderTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C442272F1987AE5800CFA98F /* BasicShaderTest.cpp */; };
+		C4DEF8BC19D5254D00F12316 /* mytest in Resources */ = {isa = PBXBuildFile; fileRef = C4DEF8BB19D5254D00F12316 /* mytest */; };
+		C4DEF8BD19D5254D00F12316 /* mytest in Resources */ = {isa = PBXBuildFile; fileRef = C4DEF8BB19D5254D00F12316 /* mytest */; };
 		D60AE43417F7FFE100757E4B /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D60AE43317F7FFE100757E4B /* CoreMotion.framework */; };
 		EDCC747F17C455FD007B692C /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDCC747E17C455FD007B692C /* IOKit.framework */; };
 /* End PBXBuildFile section */
@@ -3568,6 +3570,7 @@
 		C442272D1987AE5800CFA98F /* MyTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyTest.h; sourceTree = "<group>"; };
 		C442272F1987AE5800CFA98F /* BasicShaderTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BasicShaderTest.cpp; sourceTree = "<group>"; };
 		C44227301987AE5800CFA98F /* BasicShaderTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasicShaderTest.h; sourceTree = "<group>"; };
+		C4DEF8BB19D5254D00F12316 /* mytest */ = {isa = PBXFileReference; lastKnownFileType = folder; name = mytest; path = "../tests/cpp-tests/Resources/mytest"; sourceTree = "<group>"; };
 		D60AE43317F7FFE100757E4B /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/CoreMotion.framework; sourceTree = DEVELOPER_DIR; };
 		EDCC747E17C455FD007B692C /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -7127,6 +7130,7 @@
 		1AC35CA818CED83500F37B72 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				C4DEF8BB19D5254D00F12316 /* mytest */,
 				38FA2E75194AECF800FF2BE4 /* ActionTimeline */,
 				B2507B6A192589AF00FA4972 /* Shaders3D */,
 				3E92EA841921A7720094CD21 /* Sprite3DTest */,
@@ -8603,6 +8607,7 @@
 				1AC35CCA18CED84500F37B72 /* animations in Resources */,
 				1AC35CEA18CED84500F37B72 /* fileLookup.plist in Resources */,
 				1A221C9C191771E300FD2BE4 /* ccs-res in Resources */,
+				C4DEF8BC19D5254D00F12316 /* mytest in Resources */,
 				1AC35CF018CED84500F37B72 /* hd in Resources */,
 				1AC35CFC18CED84500F37B72 /* music.mid in Resources */,
 				1AC35D0A18CED84500F37B72 /* zwoptex in Resources */,
@@ -8692,6 +8697,7 @@
 				1AC35CD118CED84500F37B72 /* background.mp3 in Resources */,
 				1AC35CD918CED84500F37B72 /* CocosBuilderExample.ccbresourcelog in Resources */,
 				B2507B6C192589AF00FA4972 /* Shaders3D in Resources */,
+				C4DEF8BD19D5254D00F12316 /* mytest in Resources */,
 				1AC35CED18CED84500F37B72 /* fonts in Resources */,
 				1AC35CD718CED84500F37B72 /* CocosBuilderExample.ccbproj in Resources */,
 				1AC35C8918CECF1400F37B72 /* Default.png in Resources */,
@@ -10032,6 +10038,7 @@
 			buildSettings = {
 				COMPRESS_PNG_FILES = NO;
 				SDKROOT = iphoneos;
+				VALID_ARCHS = "armv7 armv7s";
 			};
 			name = Debug;
 		};
@@ -10040,6 +10047,7 @@
 			buildSettings = {
 				COMPRESS_PNG_FILES = NO;
 				SDKROOT = iphoneos;
+				VALID_ARCHS = "armv7 armv7s";
 			};
 			name = Release;
 		};
@@ -10057,6 +10065,7 @@
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/../cocos/platform/ios $(SRCROOT)/../cocos/platform/ios/Simulation $(SRCROOT)/../external/curl/include/ios";
+				VALID_ARCHS = "armv7 armv7s";
 			};
 			name = Debug;
 		};
@@ -10075,6 +10084,7 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/../cocos/platform/ios $(SRCROOT)/../cocos/platform/ios/Simulation $(SRCROOT)/../external/curl/include/ios";
 				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "armv7 armv7s";
 			};
 			name = Release;
 		};
@@ -10082,6 +10092,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				COMBINE_HIDPI_IMAGES = YES;
@@ -10111,6 +10122,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				COMBINE_HIDPI_IMAGES = YES;
