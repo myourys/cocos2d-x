@@ -904,9 +904,24 @@ void main()
 {
     vec4 color1 = texture2D(CC_Texture0, v_texCoord) * v_fragmentColor;
     vec4 color2 = color1;
-    color2.rgb = vec3(251.0/255.0,182.0/255.0,52.0/255.0) * color1.r +
-    vec3(255.0/255.0,247.0/255.0,153.0/255.0) *  color1.g +
-    vec3(149.0/255.0,148.0/255.0,120.0/255.0) * color1.b;
+//old
+//    color2.rgb = vec3(251.0/255.0,182.0/255.0,52.0/255.0) * color1.r +
+//    vec3(255.0/255.0,247.0/255.0,153.0/255.0) *  color1.g +
+//    vec3(149.0/255.0,148.0/255.0,120.0/255.0) * color1.b;
+//jin
+//    color2.rgb = vec3(250.0/255.0,190.0/255.0,80.0/255.0) * color1.r +
+//        vec3(255.0/255.0,250.0/255.0,150.0/255.0) *  color1.g +
+//        vec3(170.0/255.0,100.0/255.0,55.0/255.0) * color1.b;
+//    
+//yin
+//    color2.rgb = vec3(190.0/255.0,185.0/255.0,180.0/255.0) * color1.r +
+//    vec3(255.0/255.0,250.0/255.0,210.0/255.0) *  color1.g +
+//    vec3(105.0/255.0,120.0/255.0,135.0/255.0) * color1.b;
+    
+//tong
+    color2.rgb = vec3(225.0/255.0,140.0/255.0,85.0/255.0) * color1.r +
+    vec3(255.0/255.0,205.0/255.0,120.0/255.0) *  color1.g +
+    vec3(140.0/255.0,75.0/255.0,35.0/255.0) * color1.b;
     
     gl_FragColor = color2;
 }
@@ -916,9 +931,11 @@ void main()
 void RGBTest::onEnter()
 {
     BasicShaderTest::onEnter();
-    const char* s_rgb = "mytest/rgb.png";
+    const char* s_rgb = "mytest/rgb1.png";
     auto left = Sprite::create(s_rgb);
     auto right = Sprite::create(s_rgb);
+    left->setScale(0.4);
+    right->setScale(0.4);
     
     left->setPosition(VisibleRect::center() - Vec2(0,50));
     right->setPosition(VisibleRect::center() + Vec2(0,50));
